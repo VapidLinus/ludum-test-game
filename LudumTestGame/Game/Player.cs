@@ -17,10 +17,13 @@ namespace TestGame
 
 		private bool doubleJumped = true;
 
+		private int playerID = -1;
 		public int PlayerID
 		{
+			get { return playerID; }
 			set
 			{
+				playerID = value;
 				switch (value)
 				{
 					case 0:
@@ -45,12 +48,9 @@ namespace TestGame
 			collider = GameObject.AddComponent<BoxCollider>();
 
 			renderer.Size = collider.Size = new Vector2(.6, .8);
-
-			// renderer.Radius = 2f;
-			// renderer.Size = collider.Size = Vector2.One * 40;
 		}
 
-		public override void OnUpdate()
+		public override void OnFixedUpdate()
 		{
 			double delta = Render.Delta;
 
@@ -76,7 +76,7 @@ namespace TestGame
 			}
 
 			// Friction and gravity
-			velocity.x = MathUtil.Lerp(velocity.x, 0, Render.Delta * 10);
+			velocity.x *= .8;
 			velocity.y -= delta * 24;
 
 			// Collision Y
