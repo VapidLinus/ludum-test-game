@@ -70,28 +70,31 @@ namespace TestGame
 			{
 				if ((doubleJumped) || collider.Overlap(Transform.Position + Vector2.Down * .1) != null)
 				{
-					velocity.y = 8;
+					velocity.y = 10;
 					doubleJumped = !doubleJumped;
 				}
 			}
 
 			// Friction and gravity
 			velocity.x *= .8;
-			velocity.y -= delta * 24;
+			velocity.y -= delta * 32;
 
 			// Collision Y
-			Collider other;
+			Collision collisionY;
 			double nextY = Transform.Position.y + velocity.y * delta;
-			if ((other = collider.Overlap(new Vector2(Transform.Position.x, nextY))) != null)
+			if ((collisionY = collider.Overlap(new Vector2(Transform.Position.x, nextY))) != null)
 			{
-				if (velocity.y < 0) Transform.Position = new Vector2(Transform.Position.x, other.Top.y + collider.Size.y * .5);
+				if (velocity.y < 0) Transform.Position = collisionY.position + Vector2.Up * collider.Size.y;
+
+				Console.WriteLine(collisionY.direction + " - ");
+				Console.WriteLine(collisionY.position);
 				velocity.y = 0;
 				doubleJumped = false;
 			}
 
 			// Collision X
-			Collider otherX;
-			if (Math.Abs(velocity.x) > 0 && (otherX = collider.Overlap(Transform.Position + Vector2.Right * velocity.x * delta)) != null)
+			Collision collisionX;
+			if (Math.Abs(velocity.x) > 0 && (collisionX = collider.Overlap(Transform.Position + Vector2.Right * velocity.x * delta)) != null)
 			{
 				velocity.x = 0;
 			}
