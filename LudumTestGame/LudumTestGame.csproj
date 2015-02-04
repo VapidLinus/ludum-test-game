@@ -76,6 +76,7 @@
     <Compile Include="Game\CameraController.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\Player.cs" />
+    <Compile Include="Game\TestBox.cs" />
     <Compile Include="Game\Wall.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

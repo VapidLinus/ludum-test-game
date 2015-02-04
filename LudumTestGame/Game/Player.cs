@@ -15,7 +15,7 @@ namespace TestGame
 		private RectangleOutlineRenderer renderer;
 		private BoxCollider collider;
 
-		private bool doubleJumped = true;
+		private bool hasDoubleJumped = true;
 
 		private int playerID = -1;
 		public int PlayerID
@@ -68,41 +68,64 @@ namespace TestGame
 
 			if (Input.IsKeyPressed(keyUp))
 			{
-				if ((doubleJumped) || collider.Overlap(Transform.Position + Vector2.Down * .1) != null)
+				bool jump = false;
+				
+				if (collider.Overlap(Transform.Position + Vector2.Down * .1) != null)
 				{
-					velocity.y = 10;
-					doubleJumped = !doubleJumped;
+					jump = true;
 				}
+				else if (!hasDoubleJumped)
+				{
+					hasDoubleJumped = true;
+					jump = true;
+				}
+
+				if (jump) velocity.y = 12.5;
 			}
 
 			// Friction and gravity
 			velocity.x *= .8;
-			velocity.y -= delta * 32;
+			velocity.y -= delta * 42;
+			if (velocity.y < -16) velocity.y = -16;
 
-			// Collision Y
-			Collision collisionY;
-			double nextY = Transform.Position.y + velocity.y * delta;
-			if ((collisionY = collider.Overlap(new Vector2(Transform.Position.x, nextY))) != null)
-			{
-				if (velocity.y < 0) Transform.Position = collisionY.position + Vector2.Up * collider.Size.y;
-
-				Console.WriteLine(collisionY.direction + " - ");
-				Console.WriteLine(collisionY.position);
-				velocity.y = 0;
-				doubleJumped = false;
-			}
-
-			// Collision X
 			Collision collisionX;
-			if (Math.Abs(velocity.x) > 0 && (collisionX = collider.Overlap(Transform.Position + Vector2.Right * velocity.x * delta)) != null)
+			Vector2 nextX = new Vector2(Transform.Position.x + velocity.x * 1.5 * delta, Transform.Position.y);
+			if (velocity.x != 0 && (collisionX = collider.Overlap(nextX)) != null)
 			{
-				velocity.x = 0;
+				BoxCollider other = collisionX.collider as BoxCollider;
+				if (other != null)
+				{
+					Transform.Position = new Vector2(
+							other.Transform.Position.x + (velocity.x > 0 ? -1 : 1) * (other.Rectangle.Size.x + collider.Size.x) * .5,
+							Transform.Position.y);
+
+					velocity.x = 0;
+				}
 			}
 
-			Transform.Position += velocity * delta;
+			Collision collisionY;
+			Vector2 nextY = new Vector2(Transform.Position.x, Transform.Position.y + velocity.y * 1.5 * delta);
+			if (velocity.y != 0 && (collisionY = collider.Overlap(nextY)) != null)
+			{
+				BoxCollider other = collisionY.collider as BoxCollider;
+				if (other != null)
+				{
 
-			if (false && Input.IsKeyPressed(keyUp))
-				System.Threading.Thread.Sleep(1000);
+					Transform.Position = new Vector2(
+						Transform.Position.x,
+						other.Transform.Position.y + (velocity.y > 0 ? -1 : 1) * (other.Rectangle.Size.y + collider.Size.y) * .5);
+
+					if (velocity.y < 0)
+						hasDoubleJumped = false;
+
+					velocity.y = 0;
+				}
+			}
+
+			Transform.Position = Transform.Position + velocity * delta;
+
+			if (Transform.Position.y < -50)
+				Transform.Position = Vector2.Up * 10;
 		}
 	}
 }

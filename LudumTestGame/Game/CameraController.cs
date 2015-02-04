@@ -47,6 +47,7 @@ namespace TestGame
 			position /= targets.Count;
 
 			double targetZoom = Math.Max(50 - nearest, 10);
+			if (targets.Count == 1) targetZoom = 50;
 
 			camera.Zoom = MathUtil.Lerp(camera.Zoom, targetZoom, Render.Delta * 10);
 			Transform.Position = Vector2.Lerp(Transform.Position, position, Render.Delta * 10);
