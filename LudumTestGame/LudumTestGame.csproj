@@ -56,13 +56,13 @@
       <HintPath>..\..\..\..\Workspace\LudumBuilds\Ludum.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-audio-2">
-      <HintPath>..\..\..\..\Workspace\SFML.NET-2.1-32bits\lib\sfmlnet-audio-2.dll</HintPath>
+      <HintPath>..\..\..\Workspace\SFML\lib\sfmlnet-audio-2.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-graphics-2">
-      <HintPath>..\..\..\..\Workspace\SFML.NET-2.1-32bits\lib\sfmlnet-graphics-2.dll</HintPath>
+      <HintPath>..\..\..\Workspace\SFML\lib\sfmlnet-graphics-2.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-window-2">
-      <HintPath>..\..\..\..\Workspace\SFML.NET-2.1-32bits\lib\sfmlnet-window-2.dll</HintPath>
+      <HintPath>..\..\..\Workspace\SFML\lib\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

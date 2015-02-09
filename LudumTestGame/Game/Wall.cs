@@ -35,6 +35,14 @@ namespace TestGame
 			renderer.MainColor = new SFML.Graphics.Color((byte)random.Next(0, 255), (byte)random.Next(0, 255), (byte)random.Next(0, 255));
 		}
 
+		public override void OnFixedUpdate()
+		{
+			if (random.Next(0, 100) < 1)
+			{
+				GameObject.Destroy();
+			}
+		}
+
 		public static Wall Spawn(Vector2 position, Color color)
 		{
 			var wall = new GameObject(position).AddComponent<Wall>();
