@@ -85,7 +85,7 @@ namespace TestGame
 
 			// Friction and gravity
 			velocity.x *= .8;
-			velocity.y -= delta * 42;
+			// velocity.y -= delta * 42;
 			if (velocity.y < -16) velocity.y = -16;
 
 			Collision collisionX;

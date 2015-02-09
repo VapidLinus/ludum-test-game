@@ -14,13 +14,8 @@ namespace TestGame
 			get { return color; }
 			set
 			{
-				const int difference = 10;
-
 				color = value;
-				renderer.MainColor = new Color(
-				(byte)MathUtil.Clamp(color.R + random.Next(-difference, difference), 0, 255),
-				(byte)MathUtil.Clamp(color.G + random.Next(-difference, difference), 0, 255),
-				(byte)MathUtil.Clamp(color.B + random.Next(-difference, difference), 0, 255));
+				renderer.MainColor = color; 
             }
 		}
 
@@ -32,12 +27,12 @@ namespace TestGame
 			renderer = GameObject.AddComponent<RectangleOutlineRenderer>();
 			collider = GameObject.AddComponent<BoxCollider>();
 
-			renderer.MainColor = new SFML.Graphics.Color((byte)random.Next(0, 255), (byte)random.Next(0, 255), (byte)random.Next(0, 255));
+			renderer.MainColor = new Color((byte)random.Next(0, 255), (byte)random.Next(0, 255), (byte)random.Next(0, 255));
 		}
 
 		public override void OnFixedUpdate()
 		{
-			if (random.Next(0, 100) < 1)
+			if (random.Next(0, 100000000) < 1)
 			{
 				GameObject.Destroy();
 			}

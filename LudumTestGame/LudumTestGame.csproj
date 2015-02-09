@@ -7,7 +7,7 @@
     <ProjectGuid>{7C702B14-6B54-474E-983A-714C744E9613}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LudumTestGame</RootNamespace>
+    <RootNamespace>TestGame</RootNamespace>
     <AssemblyName>LudumTestGame</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Game\CameraController.cs" />
     <Compile Include="Game\Game.cs" />
+    <Compile Include="Game\Levels\GenerateIsland.cs" />
     <Compile Include="Game\Player.cs" />
     <Compile Include="Game\TestBox.cs" />
     <Compile Include="Game\Wall.cs" />
