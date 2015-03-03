@@ -32,7 +32,7 @@ namespace TestGame
 
 		public override void OnFixedUpdate()
 		{
-			if (random.Next(0, 100000000) < 1)
+			if (random.Next(0, 1000000) < 1)
 			{
 				GameObject.Destroy();
 			}

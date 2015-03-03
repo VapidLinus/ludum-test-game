@@ -73,9 +73,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Blade.cs" />
     <Compile Include="Game\CameraController.cs" />
     <Compile Include="Game\Game.cs" />
-    <Compile Include="Game\Levels\GenerateIsland.cs" />
+    <Compile Include="Game\Levels\IslandLevel.cs" />
+    <Compile Include="Game\Levels\GenerateWhiteLevel.cs" />
     <Compile Include="Game\Player.cs" />
     <Compile Include="Game\TestBox.cs" />
     <Compile Include="Game\Wall.cs" />

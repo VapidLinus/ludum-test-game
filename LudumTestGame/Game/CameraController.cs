@@ -34,7 +34,7 @@ namespace TestGame
 					if (i == j) continue;  // Ignore equal
 
 					Transform transform2 = targets[j];
-					double distance = Vector2.Distance(transform1.Position, transform2.Position);
+					double distance = Vector2.Distance(new Vector2(transform1.Position.x, transform1.Position.y * 1.6), new Vector2(transform2.Position.x, transform2.Position.y * 1.6));
 
 					if (distance < nearest)
 					{
