@@ -1,5 +1,6 @@
 ﻿using Ludum.Engine;
 using SFML.Graphics;
+using SFML.Window;
 using System;
 
 namespace TestGame
@@ -19,6 +20,15 @@ namespace TestGame
             }
 		}
 
+		public Vector2 Size
+		{
+			get { return renderer.Size; }
+			set
+			{
+				renderer.Size = collider.Size = value;
+			}
+		}
+
 		private RectangleOutlineRenderer renderer;
 		private BoxCollider collider;
 
@@ -28,19 +38,22 @@ namespace TestGame
 			collider = GameObject.AddComponent<BoxCollider>();
 
 			renderer.MainColor = new Color((byte)random.Next(0, 255), (byte)random.Next(0, 255), (byte)random.Next(0, 255));
+			renderer.RenderLayer++;
 		}
 
-		public override void OnFixedUpdate()
+		public static Wall Spawn(Vector2 position, Vector2 size, Color color)
 		{
-			if (random.Next(0, 1000000) < 1)
-			{
-				GameObject.Destroy();
-			}
+			var wall = new GameObject("Wall", position).AddComponent<Wall>();
+			wall.Color = color;
+
+			wall.renderer.Size = wall.collider.Size = size;
+
+			return wall;
 		}
 
 		public static Wall Spawn(Vector2 position, Color color)
 		{
-			var wall = new GameObject(position).AddComponent<Wall>();
+			var wall = new GameObject("Wall", position).AddComponent<Wall>();
 			wall.Color = color;
 
 			return wall;

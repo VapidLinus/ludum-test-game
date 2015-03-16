@@ -6,7 +6,8 @@ namespace TestGame
 	{
 		protected override void OnInitialize()
 		{
-			new IslandLevel();
+			// new IslandLevel();
+			new WhiteLevel();
         }
 	}
 }

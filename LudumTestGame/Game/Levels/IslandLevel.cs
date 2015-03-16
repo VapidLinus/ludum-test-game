@@ -8,15 +8,17 @@ namespace TestGame
 	{
 		public IslandLevel()
 		{
-			new GameObject().AddComponent<CameraController>();
+			new GameObject("Camera").AddComponent<CameraController>();
 			//new GameObject(Vector2.Zero).AddComponent<TestBox>();
 			//new GameObject(Vector2.Zero).AddComponent<TestBox>().canMove = true;
 
-			Player player1 = new GameObject(Vector2.Up * 10).AddComponent<Player>();
+			Player player1 = new GameObject("Player 1", Vector2.Up * 10).AddComponent<Player>();
 			player1.PlayerID = 0;
 
-			Player player2 = new GameObject(Vector2.Down).AddComponent<Player>();
+			Player player2 = new GameObject("Player 2", Vector2.Down).AddComponent<Player>();
 			player2.PlayerID = 1;
+
+			GameObject.Create<NPC>("NPC", new Vector2(5, 5));
 
 			Generate();
 		}
@@ -56,7 +58,7 @@ namespace TestGame
 
 		private void CreateWall(Vector2 position)
 		{
-			var wall = new GameObject().AddComponent<Wall>();
+			var wall = new GameObject("Wall").AddComponent<Wall>();
 			wall.Transform.Position = position;
 		}
 	}

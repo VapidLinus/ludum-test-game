@@ -73,14 +73,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Blade.cs" />
+    <Compile Include="Game\Entity\Blade.cs" />
     <Compile Include="Game\CameraController.cs" />
+    <Compile Include="Game\Entity\Character.cs" />
+    <Compile Include="Game\Entity\NPC.cs" />
+    <Compile Include="Game\Entity\Shard.cs" />
     <Compile Include="Game\Game.cs" />
+    <Compile Include="Game\Health.cs" />
     <Compile Include="Game\Levels\IslandLevel.cs" />
     <Compile Include="Game\Levels\GenerateWhiteLevel.cs" />
-    <Compile Include="Game\Player.cs" />
+    <Compile Include="Game\Entity\Player.cs" />
     <Compile Include="Game\TestBox.cs" />
     <Compile Include="Game\Wall.cs" />
+    <Compile Include="Game\WorldEditor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

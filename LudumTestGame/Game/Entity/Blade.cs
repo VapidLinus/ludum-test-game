@@ -7,21 +7,26 @@ namespace TestGame
 	public class Blade : Component
 	{
 		private ShapeOutlineRenderer renderer;
+		private CircleCollider collider;
 
 		private Transform target;
 		private Vector2 direction = Vector2.Zero;
+
+		private double time = 5;
 
 		public Vector2 Direction { get { return direction; } set { direction = value; } }
 
 		public override void OnAwake()
 		{
-			// Add shape outline renderer
-			renderer = GameObject.AddComponent<ShapeOutlineRenderer>();
-
 			// Values
 			const int EDGES = 12;
 			const double EDGE_LENGTH = .4;
-			const double EDGE_INNER_PERCENT = .6;
+			const double EDGE_INNER_PERCENT = .65;
+
+			// Add shape outline renderer
+			renderer = GameObject.AddComponent<ShapeOutlineRenderer>();
+			collider = GameObject.AddComponent<CircleCollider>();
+			collider.Radius = (float)EDGE_LENGTH;
 
 			// Create blade shape
 			Vector2[] points = new Vector2[EDGES * 2];
@@ -39,34 +44,43 @@ namespace TestGame
 
 		public override void OnFixedUpdate()
 		{
+			time -= Render.Delta;
+
+			if (time <= 0)
+			{
+				GameObject.Destroy();
+				return;
+			}
+
 			// Spin!
 			renderer.Rotation += 20;
 
-			// If not held
-			if (target == null)
+			// Follow target and direction
+			Transform.Position += direction * 0.8;
+
+            foreach (var collision in collider.OverlapAll(Transform.Position))
 			{
-				// Move in direction
-				Transform.Position += direction;
-			}
-			else // If held
-			{
-				// Follow target and direction
-				Transform.Position = target.Position + direction;
+				if (collision.transform == target) return;
+
+				GameObject.Destroy();
+
+				var player = collision.gameobject.GetComponent<Character>();
+				if (player != null)
+				{
+					player.Velocity += direction * 10;
+				}
 			}
 		}
 
-		/// <summary>
-		/// Release the blade from being held, letting it fly through the air
-		/// </summary>
-		public void Release()
+		public override void OnDestroy()
 		{
-			target = null;
-			direction.Normalize();
+			for (int i = 0; i < 10; i++)
+				Shard.Create(Transform.Position, renderer.MainColor, renderer.RenderLayer);
 		}
 
 		public static Blade CreateBlade(Transform target)
 		{
-			var blade = new GameObject(target.Position).AddComponent<Blade>();
+			var blade = new GameObject("Blade", target.Position).AddComponent<Blade>();
 			blade.target = target;
 
 			return blade;

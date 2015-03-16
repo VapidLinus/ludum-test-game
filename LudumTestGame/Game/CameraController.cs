@@ -13,6 +13,7 @@ namespace TestGame
 		{
 			camera = GameObject.AddComponent<Camera>();
 			Application.Scene.GameObjectCreatedHandler += OnGameObjectCreated;
+			camera.Zoom = 40;
 		}
 
 		public override void OnUpdate()
