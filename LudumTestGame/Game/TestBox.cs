@@ -16,29 +16,29 @@ namespace TestGame
 		{
 			collider = GameObject.AddComponent<BoxCollider>();
 			renderer = GameObject.AddComponent<RectangleOutlineRenderer>();
-			Transform.Scale = new Vector2(1, 1);
+			renderer.Size = collider.Size = new Vector2(1, 1);
 		}
 
 		public override void OnStart()
 		{
 			if (canMove)
-				Transform.Scale = new Vector2(.6, 2);
+				renderer.Size = collider.Size = new Vector2(.6, 2);
 		}
 
 		public override void OnFixedUpdate()
 		{
 			if (!canMove) return;
 
-			Transform.Position = new Vector2(0, -Transform.Scale.y + .5);
+			Transform.Position = new Vector2(0, -collider.Size.y + .5);
 			
 			if (Input.IsKeyDown(Keyboard.Key.D))
-				Transform.Position += Vector2.Right * Transform.Scale.x;
+				Transform.Position += Vector2.Right * collider.Size.x;
 			if (Input.IsKeyDown(Keyboard.Key.A))
-				Transform.Position += Vector2.Left * Transform.Scale.x;
+				Transform.Position += Vector2.Left * collider.Size.x;
 			if (Input.IsKeyDown(Keyboard.Key.W))
-				Transform.Position += Vector2.Up * Transform.Scale.y;
+				Transform.Position += Vector2.Up * collider.Size.y;
 			if (Input.IsKeyDown(Keyboard.Key.S))
-				Transform.Position += Vector2.Down * Transform.Scale.y;
+				Transform.Position += Vector2.Down * collider.Size.y;
 		}
 
 		public override void OnUpdate()

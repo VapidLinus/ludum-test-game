@@ -20,6 +20,15 @@ namespace TestGame
             }
 		}
 
+		public Vector2 Size
+		{
+			get { return renderer.Size; }
+			set
+			{
+				renderer.Size = collider.Size = value;
+			}
+		}
+
 		private RectangleOutlineRenderer renderer;
 		private BoxCollider collider;
 
@@ -37,7 +46,7 @@ namespace TestGame
 			var wall = new GameObject("Wall", position).AddComponent<Wall>();
 			wall.Color = color;
 
-			wall.Transform.Scale = size;
+			wall.renderer.Size = wall.collider.Size = size;
 
 			return wall;
 		}
