@@ -35,7 +35,7 @@ namespace TestGame
 			collider = GameObject.AddComponent<BoxCollider>();
 			health = GameObject.GetOrAddComponent<HealthHolder>();
 
-			renderer.Size = collider.Size = new Vector2(.6, .8);
+			Transform.Scale = new Vector2(.6, .8);
 		}
 
 		public override void OnFixedUpdate()
@@ -48,7 +48,7 @@ namespace TestGame
 			DoCollision();
 
 			// Transform
-			renderer.Rotation = MathUtil.Lerp(renderer.Rotation, targetRotation, .4f);
+			Transform.Rotation = MathUtil.Lerp(Transform.Rotation, targetRotation, .4f);
 			Transform.Position = Transform.Position + velocity * Render.Delta;
 		}
 
@@ -86,7 +86,7 @@ namespace TestGame
 					}
 
 					Transform.Position = new Vector2(
-							other.Transform.Position.x + (velocity.x > 0 ? -1 : 1) * (other.Rectangle.Size.x + collider.Size.x) * .5,
+							other.Transform.Position.x + (velocity.x > 0 ? -1 : 1) * (other.Rectangle.Size.x + Transform.Scale.x) * .5,
 							Transform.Position.y);
 
 					velocity.x = 0;
@@ -103,7 +103,7 @@ namespace TestGame
 				{
 					Transform.Position = new Vector2(
 						Transform.Position.x,
-						other.Transform.Position.y + (velocity.y > 0 ? -1 : 1) * (other.Rectangle.Size.y + collider.Size.y) * .5);
+						other.Transform.Position.y + (velocity.y > 0 ? -1 : 1) * (other.Rectangle.Size.y + Transform.Scale.y) * .5);
 
 					if (velocity.y < 0)
 						hasDoubleJumped = false;

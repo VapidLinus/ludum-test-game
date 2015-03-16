@@ -105,8 +105,8 @@ namespace TestGame
 				Wall wall = walls[i];
 				config.SetValue("wall-" + i + "-pos-x", wall.Transform.Position.x);
 				config.SetValue("wall-" + i + "-pos-y", wall.Transform.Position.y);
-				config.SetValue("wall-" + i + "-scale-x", wall.Size.x);
-				config.SetValue("wall-" + i + "-scale-y", wall.Size.y);
+				config.SetValue("wall-" + i + "-scale-x", wall.Transform.Scale.x);
+				config.SetValue("wall-" + i + "-scale-y", wall.Transform.Scale.y);
 				config.SetValue("wall-" + i + "-color-r", wall.Color.R);
 				config.SetValue("wall-" + i + "-color-g", wall.Color.G);
 				config.SetValue("wall-" + i + "-color-b", wall.Color.B);
