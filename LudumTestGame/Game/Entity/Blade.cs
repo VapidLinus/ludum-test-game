@@ -67,14 +67,15 @@ namespace TestGame
 				var player = collision.gameobject.GetComponent<Character>();
 				if (player != null)
 				{
-					player.Velocity += direction * 10;
+					player.GameObject.Destroy();
+					// player.Velocity += direction * 10;
 				}
 			}
 		}
 
 		public override void OnDestroy()
 		{
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 100; i++)
 				Shard.Create(Transform.Position, renderer.MainColor, renderer.RenderLayer);
 		}
 

@@ -18,6 +18,12 @@ namespace TestGame
 
 		public override void OnUpdate()
 		{
+			targets = new List<Transform>();
+			foreach (var player in Application.Scene.FindComponents<Player>())
+			{
+				targets.Add(player.Transform);
+			}
+
 			// Only if there are targets
 			if (targets.Count == 0) return;
 

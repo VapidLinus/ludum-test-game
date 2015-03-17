@@ -15,14 +15,22 @@ namespace TestGame
 		{
 			if (Input.IsMousePressed(Mouse.Button.Left))
 			{
-				var collider = Collider.CheckCollision(Camera.Main.ScreenToWorldInvertedY(Input.GetMousePosition()));
+				var collider = Collider.CheckCollision(Camera.Main.ScreenToWorld(Input.GetMousePosition()));
 				if (collider != null)
 				{
 					selected = collider.Transform;
 				}
 			}
+			if (Input.IsMousePressed(Mouse.Button.Right))
+			{
+				var collider = Collider.CheckCollision(Camera.Main.ScreenToWorld(Input.GetMousePosition()));
+				if (collider != null)
+				{
+					collider.GameObject.Destroy();
+				}
+			}
 
-			if (selected != null)
+			if (selected != null && !Input.IsKeyDown(Keyboard.Key.LControl))
 			{
 				Vector2 input = Vector2.Zero;
 				if (Input.IsKeyPressed(Keyboard.Key.A)) input.x--;
@@ -32,38 +40,76 @@ namespace TestGame
 
 				if (Input.IsKeyDown(Keyboard.Key.LShift) && input != Vector2.Zero)
 				{
-					foreach (var component in selected.GameObject.Components)
-					{
-						var sizeable = component as ISizable;
-						Console.WriteLine(component.ToString());
-						Console.WriteLine(sizeable);
-						if (sizeable != null)
-						{
-							Console.WriteLine(sizeable.Size + "+=" + input);
-							sizeable.Size += input;
-                        }
-					}
-				} else
+					selected.Scale += input;
+				}
+				else
 				{
 					selected.Position += input;
-				}	
+				}
+
+				if (Input.IsKeyPressed(Keyboard.Key.Num1))
+				{
+					Wall wall = selected.GameObject.GetComponent<Wall>();
+					if (wall != null)
+					{
+						Color color = wall.Color;
+						color.R = (byte)((wall.Color.R + 64) % 256);
+						wall.Color = color;
+					}
+				}
+				if (Input.IsKeyPressed(Keyboard.Key.Num2))
+				{
+					Wall wall = selected.GameObject.GetComponent<Wall>();
+					if (wall != null)
+					{
+						Color color = wall.Color;
+						color.G = (byte)((wall.Color.G + 64) % 256);
+						wall.Color = color;
+					}
+				}
+				if (Input.IsKeyPressed(Keyboard.Key.Num3))
+				{
+					Wall wall = selected.GameObject.GetComponent<Wall>();
+					if (wall != null)
+					{
+						Color color = wall.Color;
+						color.B = (byte)((wall.Color.B + 64) % 256);
+						wall.Color = color;
+					}
+				}
 			}
 
 			if (Input.IsKeyPressed(Keyboard.Key.C))
 			{
-				Wall.Spawn(Vector2.Zero, Color.Green);
+				selected = Wall.Spawn(Vector2.Zero, Color.White).Transform;
 			}
 
-			if (Input.IsKeyDown(Keyboard.Key.LControl) && Input.IsKeyPressed(Keyboard.Key.S))
+			Vector2 cameraInput = Vector2.Zero;
+			if (Input.IsKeyDown(Keyboard.Key.Left)) cameraInput.x--;
+			if (Input.IsKeyDown(Keyboard.Key.Right)) cameraInput.x++;
+			if (Input.IsKeyDown(Keyboard.Key.Up)) cameraInput.y++;
+			if (Input.IsKeyDown(Keyboard.Key.Down)) cameraInput.y--;
+			Application.Scene.FindComponent<Camera>().Transform.Position += cameraInput.Normalized * 50 * Render.Delta;
+
+			if (Input.IsKeyDown(Keyboard.Key.PageUp))
 			{
-				Console.WriteLine("Saving...");
-				SaveWorld("level1.conf");
-				Console.WriteLine("Saved!");
+				Application.Scene.FindComponent<Camera>().Zoom += 50 * Render.Delta;
+			}
+
+			if (Input.IsKeyDown(Keyboard.Key.PageDown))
+			{
+				Application.Scene.FindComponent<Camera>().Zoom -= 50 * Render.Delta;
 			}
 		}
 
 		public static void CreateWorld(string filename)
 		{
+			// Remove walls
+			foreach (Wall wall in Application.Scene.FindComponents<Wall>())
+			{
+				wall.GameObject.Destroy();
+			}
+
 			Config config = new Config(Application.DataPath + @"\Levels\" + filename);
 
 			try

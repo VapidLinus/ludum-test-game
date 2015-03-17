@@ -6,8 +6,7 @@ namespace TestGame
 	{
 		protected override void OnInitialize()
 		{
-			// new IslandLevel();
-			new WhiteLevel();
+			GameObject.Create<LevelController>("Level Controller");
         }
 	}
 }

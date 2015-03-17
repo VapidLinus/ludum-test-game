@@ -71,6 +71,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="XInputDotNetPure">
+      <HintPath>..\..\ludum\Ludum\DLL\XInputDotNetPure.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game\Entity\Blade.cs" />
@@ -80,8 +83,7 @@
     <Compile Include="Game\Entity\Shard.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\Health.cs" />
-    <Compile Include="Game\Levels\IslandLevel.cs" />
-    <Compile Include="Game\Levels\GenerateWhiteLevel.cs" />
+    <Compile Include="Game\Levels\LevelController.cs" />
     <Compile Include="Game\Entity\Player.cs" />
     <Compile Include="Game\TestBox.cs" />
     <Compile Include="Game\Wall.cs" />
@@ -90,7 +92,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="csfml-audio-2.dll">
@@ -106,6 +110,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="openal32.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XInputInterface.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
