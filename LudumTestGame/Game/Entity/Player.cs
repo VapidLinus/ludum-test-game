@@ -1,6 +1,9 @@
 ﻿using Ludum.Engine;
 using SFML.Window;
+using SFML.Graphics;
 using XInputDotNetPure;
+using Sprite = Ludum.UI.Sprite;
+using System;
 
 namespace TestGame
 {
@@ -8,53 +11,63 @@ namespace TestGame
 	{
 		public Character Character { get; set; }
 
-		private Keyboard.Key keyUp, keyDown, keyLeft, keyRight, keyPrimary, keySeconday;
+		private const Keyboard.Key
+			KEY_UP = Keyboard.Key.Up,
+			KEY_DOWN = Keyboard.Key.Down,
+			KEY_LEFT = Keyboard.Key.Left,
+			KEY_RIGHT = Keyboard.Key.Right,
+			KEY_PRIMARY = Keyboard.Key.Z,
+			KEY_SECONDARY = Keyboard.Key.X;
 
-		private Blade heldBlade;
-		private bool controllerCanJump = true;
-		private bool controllerCanShoot = true;
+		private Blade bladeHeld;
+		private Texture bladeTexture;
+		private Sprite[] bladeSprites;
 
-		private float cooldown = 0;
+		private int ammo = 3;
+		private int Ammo
+		{
+			get { return ammo; }
+			set
+			{
+				ammo = Math.Max(value, 0);
+
+				// Clear previous array
+				if (bladeSprites != null)
+					foreach (var s in bladeSprites) s.Dispose();
+
+				// Create new sprites
+				bladeSprites = new Sprite[ammo];
+				for (int i = 0; i < ammo; i++)
+				{
+					bladeSprites[i] = new Sprite(GetBladeSpritePosition(i), new Texture(bladeTexture));
+				}
+			}
+		}
+
+		public bool IsHoldingBlade { get { return bladeHeld != null; } }
 
 		private PlayerIndex playerIndex;
 		public PlayerIndex PlayerIndex
 		{
 			get { return playerIndex; }
-			set
-			{
-				playerIndex = value;
-				switch (value)
-				{
-					case PlayerIndex.One:
-						keyUp = Keyboard.Key.W;
-						keyDown = Keyboard.Key.S;
-						keyLeft = Keyboard.Key.A;
-						keyRight = Keyboard.Key.D;
-						keyPrimary = Keyboard.Key.C;
-						keySeconday = Keyboard.Key.V;
-						break;
-					case PlayerIndex.Two:
-                        keyUp = Keyboard.Key.Up;
-						keyDown = Keyboard.Key.Down;
-						keyLeft = Keyboard.Key.Left;
-						keyRight = Keyboard.Key.Right;
-						keyPrimary = Keyboard.Key.C;
-						keySeconday = Keyboard.Key.Period;
-						break;
-				}
-			}
+			set { playerIndex = value; }
 		}
 
 		public override void OnAwake()
 		{
+			bladeTexture = Resources.LoadTexture("Textures/blade_small.png");
+
 			Character = GameObject.GetOrAddComponent<Character>();
+		}
+
+		public override void OnStart()
+		{
+			Ammo = 3;
 		}
 
 		public override void OnFixedUpdate()
 		{
 			double delta = Render.Delta;
-
-			cooldown -= (float)Render.Delta;
 
 			// Respawn if out of world
 			if (Transform.Position.y < -50)
@@ -62,81 +75,82 @@ namespace TestGame
 
 			// Input
 			var gamepad = GamePad.GetState(PlayerIndex);
-			float inputX = 0f;
+			Vector2 input = Vector2.Zero;
 
 			if (gamepad.IsConnected)
 			{
-				inputX = GamePad.GetState(PlayerIndex).ThumbSticks.Left.X * 1.1f;
+				input.x = Input.GetAxis(playerIndex, XInputAxis.LeftX);
+				input.y = Input.GetAxis(playerIndex, XInputAxis.LeftY);
 
-				if (controllerCanJump && gamepad.Buttons.A == ButtonState.Pressed)
-				{
-					controllerCanJump = false;
+				if (Input.IsButtonPressed(playerIndex, XInputButton.A))
 					Character.Jump();
-				}
-				else if (gamepad.Buttons.A == ButtonState.Released)
-				{
-					controllerCanJump = true;
-				}
 
-				if (controllerCanShoot && gamepad.Buttons.X == ButtonState.Pressed)
-				{
-					controllerCanShoot = false;
-					Shoot();
-				}
-				else if (gamepad.Buttons.X == ButtonState.Released)
-				{
-					controllerCanShoot = true;
-				}
+				if (Input.IsButtonPressed(playerIndex, XInputButton.X))
+					OnShootHold(Vector2.FromAngle(Math.Round(Vector2.ToAngle(input.Normalized) / 45f) * 45));
+				else if (Input.IsButtonReleased(playerIndex, XInputButton.X))
+					OnShootRelease();
 			}
 			else
 			{
-				if (Input.IsKeyDown(keyLeft)) inputX--;
-				if (Input.IsKeyDown(keyRight)) inputX++;
+				if (Input.IsKeyDown(KEY_RIGHT)) input.x++;
+				if (Input.IsKeyDown(KEY_LEFT)) input.x--;
+				if (Input.IsKeyDown(KEY_UP)) input.y++;
+				if (Input.IsKeyDown(KEY_DOWN)) input.y--;
 
-				if (Input.IsKeyDown(keyUp))
-				{
+				if (Input.IsKeyPressed(KEY_PRIMARY))
 					Character.Jump();
-				}
-				if (Input.IsKeyPressed(keyPrimary))
-				{
-					Shoot();
-				}
-            }
 
-			Character.Move(MathUtil.Clamp(inputX, -1f, 1f));
-
-			if (Input.IsKeyPressed(keyPrimary) || gamepad.IsConnected && gamepad.Buttons.B == ButtonState.Pressed)
-			{
-				
+				if (Input.IsKeyPressed(KEY_SECONDARY))
+					OnShootHold(Vector2.FromAngle(Math.Round(Vector2.ToAngle(input.Normalized) / 45f) * 45));
+				else if (Input.IsKeyReleased(KEY_SECONDARY))
+					OnShootRelease();
 			}
+
+			if (IsHoldingBlade)
+			{
+				// Snap to 45 degrees
+				bladeHeld.Direction = Vector2.FromAngle(Math.Round(Vector2.ToAngle(input.Normalized) / 45f) * 45);
+			}
+			else
+			{
+				Character.Move(MathUtil.Clamp(input.x, -1f, 1f));
+			}
+
 		}
 
-		void Shoot()
+		public Vector2f GetBladeSpritePosition(int index)
 		{
-			if (cooldown > 0)
+			int direction = PlayerIndex == PlayerIndex.One ? 1 : -1;
+			float x = playerIndex == PlayerIndex.One ? 10 : Render.WindowWidth - bladeTexture.Size.X - 10;
+			return new Vector2f(x + direction * 55 * index, 10);
+		}
+
+		void OnShootHold(Vector2 direction)
+		{
+			if (ammo < 1) return;
+
+			if (IsHoldingBlade)
 			{
+				Debug.LogWarning("Trying to initiate blade hold, but already holding!");
 				return;
 			}
 
-			cooldown = 0.6f;
+			bladeHeld = Blade.CreateBlade(Transform, direction);
+		}
 
-			heldBlade = Blade.CreateBlade(Transform);
+		void OnShootRelease()
+		{
+			Ammo--;
+			if (bladeHeld != null) bladeHeld.Release();
+			bladeHeld = null;
+		}
 
-			Player nearest = null;
-			double nearestDistance = double.MaxValue;
-			foreach (Player other in Application.Scene.FindComponents<Player>())
+		public override void OnDestroy()
+		{
+			for (int i = 0; i < bladeSprites.Length; i++)
 			{
-				if (other == this) continue;
-				double distance = Vector2.Distance(Transform.Position, other.Transform.Position);
-				if (distance < nearestDistance)
-				{
-					nearest = other;
-					nearestDistance = distance;
-				}
+				bladeSprites[i].Dispose();
 			}
-
-			if (nearest != null)
-				heldBlade.Direction = (nearest.Transform.Position - Transform.Position).Normalized;
 		}
 	}
 }

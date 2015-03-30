@@ -16,7 +16,7 @@ namespace TestGame
 			camera.Zoom = 40;
 		}
 
-		public override void OnUpdate()
+		public override void OnLateUpdate()
 		{
 			targets = new List<Transform>();
 			foreach (var player in Application.Scene.FindComponents<Player>())
@@ -56,7 +56,7 @@ namespace TestGame
 			double targetZoom = Math.Max(50 - nearest, 10);
 			if (targets.Count == 1) targetZoom = 50;
 
-			camera.Zoom = MathUtil.Lerp(camera.Zoom, targetZoom, Render.Delta * 10);
+			camera.Zoom = MathUtil.Lerp(camera.Zoom, targetZoom * ((float)Render.WindowWidth / 1280), Render.Delta * 10);
 			Transform.Position = Vector2.Lerp(Transform.Position, position, Render.Delta * 10);
 		}
 

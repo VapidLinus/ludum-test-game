@@ -1,4 +1,5 @@
-﻿using Ludum.Engine;
+﻿using System;
+using Ludum.Engine;
 using SFML.Graphics;
 using Transform = Ludum.Engine.Transform;
 
@@ -6,13 +7,17 @@ namespace TestGame
 {
 	public class Blade : Component
 	{
+		private const float MAX_SPIN_SPEED = 600;
+
 		private ShapeOutlineRenderer renderer;
 		private CircleCollider collider;
 
 		private Transform target;
-		private Vector2 direction = Vector2.Zero;
+		private bool isHeld = true;
+		private Vector2 direction = Vector2.Right;
 
-		private double time = 5;
+		private double lifeTime = 5;
+		private float spinSpeed = 0;
 
 		public Vector2 Direction { get { return direction; } set { direction = value; } }
 
@@ -42,47 +47,64 @@ namespace TestGame
 			renderer.MainColor = new Color(160, 160, 160);
 		}
 
+		public override void OnUpdate()
+		{
+			// Spin!
+			spinSpeed = Math.Min(spinSpeed + (float)Render.Delta * MAX_SPIN_SPEED, MAX_SPIN_SPEED);
+			renderer.Rotation += spinSpeed * (float)Render.Delta;
+		}
+
 		public override void OnFixedUpdate()
 		{
-			time -= Render.Delta;
-
-			if (time <= 0)
+			if (isHeld)
 			{
-				GameObject.Destroy();
-				return;
+				Transform.Position = target.Position + Direction;
 			}
-
-			// Spin!
-			renderer.Rotation += 20;
-
-			// Follow target and direction
-			Transform.Position += direction * 0.8;
-
-            foreach (var collision in collider.OverlapAll(Transform.Position))
+			else
 			{
-				if (collision.transform == target) return;
+				lifeTime -= Render.Delta;
 
-				GameObject.Destroy();
-
-				var player = collision.gameobject.GetComponent<Character>();
-				if (player != null)
+				if (lifeTime <= 0)
 				{
-					player.GameObject.Destroy();
-					// player.Velocity += direction * 10;
+					GameObject.Destroy();
+					return;
+				}
+
+				// Follow target and direction
+				Transform.Position += direction * 0.8;
+
+				foreach (var collision in collider.OverlapAll(Transform.Position))
+				{
+					if (collision.transform == target) return;
+
+					GameObject.Destroy();
+
+					var player = collision.gameobject.GetComponent<Character>();
+					if (player != null)
+					{
+						player.GameObject.Destroy();
+						// player.Velocity += direction * 10;
+					}
 				}
 			}
 		}
 
 		public override void OnDestroy()
 		{
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 40; i++)
 				Shard.Create(Transform.Position, renderer.MainColor, renderer.RenderLayer);
 		}
 
-		public static Blade CreateBlade(Transform target)
+		public void Release()
 		{
-			var blade = new GameObject("Blade", target.Position).AddComponent<Blade>();
+			isHeld = false;
+        }
+
+		public static Blade CreateBlade(Transform target, Vector2 direction)
+		{
+			var blade = new GameObject("Blade", target.Position + direction).AddComponent<Blade>();
 			blade.target = target;
+			blade.Direction = direction;
 
 			return blade;
 		}

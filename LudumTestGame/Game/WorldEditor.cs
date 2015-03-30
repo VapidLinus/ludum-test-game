@@ -134,7 +134,7 @@ namespace TestGame
 			catch (Exception e)
 			{
 				e.PrintStackTrace();
-				Console.WriteLine("Corrupted world file: " + filename);
+				Debug.LogError("Corrupted world file: " + filename);
 			}
 
 		}
