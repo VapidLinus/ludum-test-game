@@ -6,7 +6,7 @@ namespace TestGame
 	{
 		protected override void OnInitialize()
 		{
-			GameObject.Create<LevelController>("Level Controller");
+			MenuScene.SwitchScene();
         }
 	}
 }

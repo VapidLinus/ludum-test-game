@@ -2,6 +2,7 @@
 using Ludum.Engine;
 using SFML.Graphics;
 using Transform = Ludum.Engine.Transform;
+using SFML.Audio;
 
 namespace TestGame
 {
@@ -19,10 +20,19 @@ namespace TestGame
 		private double lifeTime = 5;
 		private float spinSpeed = 0;
 
+		private double activateGravityTime = .4;
+
+        private Sound holdLoop;
+
 		public Vector2 Direction { get { return direction; } set { direction = value; } }
 
 		public override void OnAwake()
 		{
+            holdLoop = Media.SoundChainsawLoop;
+            holdLoop.Play();
+            holdLoop.Loop = true;
+            holdLoop.Volume = 0f;
+
 			// Values
 			const int EDGES = 12;
 			const double EDGE_LENGTH = .4;
@@ -49,20 +59,28 @@ namespace TestGame
 
 		public override void OnUpdate()
 		{
-			// Spin!
-			spinSpeed = Math.Min(spinSpeed + (float)Render.Delta * MAX_SPIN_SPEED, MAX_SPIN_SPEED);
+			if (Menu.IsPaused) return;
+
+            holdLoop.Volume = MathUtil.Lerp(holdLoop.Volume, 40f, (float)Render.Delta);
+
+            // Spin!
+            spinSpeed = Math.Min(spinSpeed + (float)Render.Delta * MAX_SPIN_SPEED, MAX_SPIN_SPEED);
 			renderer.Rotation += spinSpeed * (float)Render.Delta;
 		}
 
 		public override void OnFixedUpdate()
 		{
+			if (Menu.IsPaused) return;
+
 			if (isHeld)
 			{
-				Transform.Position = target.Position + Direction;
+				Transform.Position = target.Position + Direction + Vector2.Up * .1;
 			}
 			else
 			{
 				lifeTime -= Render.Delta;
+				activateGravityTime -= Render.Delta;
+
 
 				if (lifeTime <= 0)
 				{
@@ -73,30 +91,48 @@ namespace TestGame
 				// Follow target and direction
 				Transform.Position += direction * 0.8;
 
-				foreach (var collision in collider.OverlapAll(Transform.Position))
+				
+				if (activateGravityTime < 0)
 				{
-					if (collision.transform == target) return;
+					direction.y -= .06;
+				}
+			}
+
+			foreach (var collision in collider.OverlapAll(Transform.Position))
+			{
+				if (collision.transform == target) return;
+
+				var blade = collision.gameobject.GetComponent<Blade>();
+				var player = collision.gameobject.GetComponent<Character>();
+
+				if (blade == true || player == true)
+				{
+					if (blade) blade.GameObject.Destroy();
+					if (player) player.GameObject.Destroy();
 
 					GameObject.Destroy();
-
-					var player = collision.gameobject.GetComponent<Character>();
-					if (player != null)
-					{
-						player.GameObject.Destroy();
-						// player.Velocity += direction * 10;
-					}
+				}
+				else if (!isHeld)
+				{
+					GameObject.Destroy();
 				}
 			}
 		}
 
 		public override void OnDestroy()
 		{
-			for (int i = 0; i < 40; i++)
+            holdLoop.Dispose();
+
+            for (int i = 0; i < 40; i++)
 				Shard.Create(Transform.Position, renderer.MainColor, renderer.RenderLayer);
+
+            Media.PlayOnce(Media.SoundExplode, 40f);
 		}
 
 		public void Release()
 		{
+            holdLoop.Stop();
+            Media.PlayOnce(Media.SoundShoot);
 			isHeld = false;
         }
 

@@ -36,6 +36,8 @@ namespace TestGame
 
 		public override void OnFixedUpdate()
 		{
+			if (Menu.IsPaused) return;
+
 			velocity.y -= .02;
 			Transform.Position += velocity;
 			renderer.Rotation += (float)velocity.x;

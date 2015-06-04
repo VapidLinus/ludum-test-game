@@ -9,6 +9,8 @@ namespace TestGame
 {
 	public class Player : Component
 	{
+		private const double DASH_TIME = .2;
+
 		public Character Character { get; set; }
 
 		private const Keyboard.Key
@@ -17,14 +19,20 @@ namespace TestGame
 			KEY_LEFT = Keyboard.Key.Left,
 			KEY_RIGHT = Keyboard.Key.Right,
 			KEY_PRIMARY = Keyboard.Key.Z,
-			KEY_SECONDARY = Keyboard.Key.X;
+			KEY_SECONDARY = Keyboard.Key.X,
+			KEY_DASH = Keyboard.Key.C;
 
 		private Blade bladeHeld;
 		private Texture bladeTexture;
 		private Sprite[] bladeSprites;
 
+		private Vector2 lastDirection = Vector2.Right;
+
+		private Vector2 dashDirection;
+		private double dashTime = 0;
+
 		private int ammo = 3;
-		private int Ammo
+		public int Ammo
 		{
 			get { return ammo; }
 			set
@@ -62,16 +70,26 @@ namespace TestGame
 
 		public override void OnStart()
 		{
-			Ammo = 3;
+			Transform.Position = Tag.GetRandomTag("spawn").Transform.Position;
+			Ammo = 2;
 		}
 
 		public override void OnFixedUpdate()
 		{
+			if (Menu.IsPaused) return;
+
 			double delta = Render.Delta;
 
 			// Respawn if out of world
 			if (Transform.Position.y < -50)
-				Transform.Position = Vector2.Up * 10;
+				Destroy();
+
+			dashTime += delta;
+
+			if (dashTime < DASH_TIME)
+			{
+				Character.Velocity = dashDirection * 20;
+			}
 
 			// Input
 			var gamepad = GamePad.GetState(PlayerIndex);
@@ -85,9 +103,12 @@ namespace TestGame
 				if (Input.IsButtonPressed(playerIndex, XInputButton.A))
 					Character.Jump();
 
+				if (Input.IsButtonPressed(playerIndex, XInputButton.RightShoulder))
+					TryDash();
+
 				if (Input.IsButtonPressed(playerIndex, XInputButton.X))
 					OnShootHold(Vector2.FromAngle(Math.Round(Vector2.ToAngle(input.Normalized) / 45f) * 45));
-				else if (Input.IsButtonReleased(playerIndex, XInputButton.X))
+				else if (bladeHeld != null && !Input.IsButtonDown(playerIndex, XInputButton.X))
 					OnShootRelease();
 			}
 			else
@@ -100,16 +121,24 @@ namespace TestGame
 				if (Input.IsKeyPressed(KEY_PRIMARY))
 					Character.Jump();
 
+				if (Input.IsKeyPressed(KEY_DASH))
+					TryDash();
+
 				if (Input.IsKeyPressed(KEY_SECONDARY))
 					OnShootHold(Vector2.FromAngle(Math.Round(Vector2.ToAngle(input.Normalized) / 45f) * 45));
-				else if (Input.IsKeyReleased(KEY_SECONDARY))
+				else if (bladeHeld != null && !Input.IsKeyDown(KEY_SECONDARY))
 					OnShootRelease();
 			}
+
+			if (input.SquareMagnitude > .2)
+				lastDirection = Vector2.FromAngle(Math.Round(Vector2.ToAngle(input.Normalized) / 45f) * 45);
+            
 
 			if (IsHoldingBlade)
 			{
 				// Snap to 45 degrees
-				bladeHeld.Direction = Vector2.FromAngle(Math.Round(Vector2.ToAngle(input.Normalized) / 45f) * 45);
+				if (input != Vector2.Zero)
+					bladeHeld.Direction = lastDirection;
 			}
 			else
 			{
@@ -131,22 +160,42 @@ namespace TestGame
 
 			if (IsHoldingBlade)
 			{
-				Debug.LogWarning("Trying to initiate blade hold, but already holding!");
+				Debug.LogWarning("Trying to instantiate  blade hold, but already holding!");
 				return;
 			}
 
 			bladeHeld = Blade.CreateBlade(Transform, direction);
+			bladeHeld.Direction = lastDirection;
+			Ammo--;
+		}
+
+		void TryDash()
+		{
+			return;
+			if (dashTime > DASH_TIME)
+			{
+				dashTime = 0;
+				dashDirection = lastDirection;
+			}
 		}
 
 		void OnShootRelease()
 		{
-			Ammo--;
-			if (bladeHeld != null) bladeHeld.Release();
+			
+            if (bladeHeld != null)
+			{
+				bladeHeld.Release();
+				lastDirection = bladeHeld.Direction;
+            }
 			bladeHeld = null;
 		}
 
 		public override void OnDestroy()
 		{
+			if (bladeHeld != null) bladeHeld.Release();
+
+            Media.PlayOnce(Media.SoundDeath);
+
 			for (int i = 0; i < bladeSprites.Length; i++)
 			{
 				bladeSprites[i].Dispose();

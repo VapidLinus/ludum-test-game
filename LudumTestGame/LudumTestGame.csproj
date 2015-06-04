@@ -76,18 +76,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Entity\AmmoCrate.cs" />
     <Compile Include="Game\Entity\Blade.cs" />
     <Compile Include="Game\CameraController.cs" />
     <Compile Include="Game\Entity\Character.cs" />
+    <Compile Include="Game\Entity\Menu.cs" />
     <Compile Include="Game\Entity\NPC.cs" />
     <Compile Include="Game\Entity\Shard.cs" />
+    <Compile Include="Game\Entity\Tag.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\Health.cs" />
-    <Compile Include="Game\Levels\LevelController.cs" />
+    <Compile Include="Game\Levels\PlayScene.cs" />
     <Compile Include="Game\Entity\Player.cs" />
+    <Compile Include="Game\Levels\MenuScene.cs" />
+    <Compile Include="Game\Media.cs" />
     <Compile Include="Game\TestBox.cs" />
     <Compile Include="Game\Wall.cs" />
-    <Compile Include="Game\WorldEditor.cs" />
+    <Compile Include="Game\Levels\EditorScene.cs" />
+    <Compile Include="Game\LevelUtil.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

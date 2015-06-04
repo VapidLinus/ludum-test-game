@@ -15,9 +15,10 @@ namespace TestGame
 		}
 
 		public bool CanMove { get; set; }
+		public bool GravityEnabled { get; set; }
 
 		private const float WALL_JUMP_LEAN = 40;
-		private const double JUMP_FORCE = 12;
+		private const double JUMP_FORCE = 14;
 
 		private Vector2 velocity = Vector2.Zero;
 		public Vector2 Velocity { get { return velocity; } set { velocity = value; } }
@@ -30,6 +31,7 @@ namespace TestGame
 		public override void OnAwake()
 		{
 			CanMove = true;
+			GravityEnabled = true;
 
 			renderer = GameObject.AddComponent<RectangleOutlineRenderer>();
 			collider = GameObject.AddComponent<BoxCollider>();
@@ -40,10 +42,15 @@ namespace TestGame
 
 		public override void OnFixedUpdate()
 		{
+			if (Menu.IsPaused) return;
+
 			// Friction and gravity
 			velocity.x *= .8;
-			velocity.y -= Render.Delta * 42;
-			if (velocity.y < -16) velocity.y = -16;
+			if (GravityEnabled)
+			{
+				velocity.y -= Render.Delta * 42;
+				if (velocity.y < -16) velocity.y = -16;
+			}
 
 			DoCollision();
 
@@ -128,13 +135,15 @@ namespace TestGame
 					targetRotation = -WALL_JUMP_LEAN;
 					velocity.y = JUMP_FORCE;
 					velocity.x = 16;
+                    Media.PlayOnce(Media.SoundJumpWall, 60f);
 				}
 				else
 				{
 					targetRotation = WALL_JUMP_LEAN;
 					velocity.y = JUMP_FORCE;
 					velocity.x = -16;
-				}
+                    Media.PlayOnce(Media.SoundJumpWall, 60f);
+                }
 			}
 			else
 			{
@@ -143,11 +152,13 @@ namespace TestGame
 				if (collider.Overlap(Transform.Position + Vector2.Down * .1) != null)
 				{
 					shouldJump = true;
+                    Media.PlayOnce(Media.SoundJump);
 				}
 				else if (!hasDoubleJumped)
 				{
 					hasDoubleJumped = true;
 					shouldJump = true;
+                    Media.PlayOnce(Media.SoundDash);
 				}
 
 				if (shouldJump) velocity.y = JUMP_FORCE;

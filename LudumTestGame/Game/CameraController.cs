@@ -53,7 +53,7 @@ namespace TestGame
 			}
 			position /= targets.Count;
 
-			double targetZoom = Math.Max(50 - nearest, 10);
+			double targetZoom = Math.Max(60 - nearest, 10);
 			if (targets.Count == 1) targetZoom = 50;
 
 			camera.Zoom = MathUtil.Lerp(camera.Zoom, targetZoom * ((float)Render.WindowWidth / 1280), Render.Delta * 10);
